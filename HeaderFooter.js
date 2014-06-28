@@ -1,4 +1,4 @@
-addHeaderAndFooter();
+$(document).ready(addHeaderAndFooter);
 
 function addHeaderAndFooter() {
    var header = $('<div id="header">' + getHeaderHtml() + '</div>');
@@ -9,43 +9,38 @@ function addHeaderAndFooter() {
 
 function getHeaderHtml() {
    switch (location.protocol) {
-      case 'file:':
-         if (!location.pathname.match(/\/Rally\//)) {
-            throw new InputError('pathname', 'Rally');
-         }
+      case 'http:':
+      case 'https:':
+         var projectHierarchy = location.pathname.split('/').map(
+          function getProjectHierarchy(file, index, files) {
+            file = decodeURI(file);
 
-         var fileHierarchy = location.pathname.split('/');
-
-         var projectHierarchy = fileHierarchy.reduce(
-          function getProjectHierarchy(hierarchy, file, index) {
-            // Root has already been found.
-            if (hierarchy.length) {
-               if (index === fileHierarchy.length - 1) {
-                  hierarchy.push({'name' : file, 'url' : null});
-               } else {
-                  hierarchy.push({'name' : file, 'url' : getRelativePath()});
-               }
+            if (index === 0) {
+               return {'name' : 'Rally', 'url' : getRelativePath()};
+            } else if (index === files.length - 1) {
+               return {'name' : file, 'url' : getRelativePath()};
             } else {
-               if (file === 'Rally') {
-                  hierarchy.push({'name' : 'Rally', 'url' : getRelativePath()});
-               }
+               return {'name' : file, 'url' : getRelativePath()};
             }
-            return hierarchy;
+
             function getRelativePath () {
-               var dirsDeep = fileHierarchy.length - index - 2;
+               var dirsDeep = files.length - index - 2;
                if (dirsDeep == 0) {
-                  return './index.html';
+                  return './';
                } else if (dirsDeep > 0) {
                   var path = '';
                   for (var i = 0; i < dirsDeep; ++i) {
                      path += '../'
                   }
-                  return path + 'index.html';
+                  return path;
+               } else if (dirsDeep == -1 ) {
+                  return './' + file;
                } else {
                   throw new LogicError('dirsDeep should never be negative');
                }
             }
-         }, []);
+         });
+
          var fileHtmls = projectHierarchy.map(function toLink(file) {
             if (file.url) {
                return '<a href="' + file.url + '">' + decodeURI(file.name) +
@@ -55,13 +50,9 @@ function getHeaderHtml() {
             }
          });
          break;
-      case 'http:':
-      case 'https:':
-         throw new NotImplementedError('http and https not implemented yet');
-         break;
       default:
          throw new InputError('location.protocol',
-          "'file:', 'http:', or 'https:'");
+          "'http:', or 'https:'");
    }
 
    return fileHtmls.join(' / ');
