@@ -1,0 +1,29 @@
+body, html {
+   min-height: 100%;
+   padding 0;
+   margin: 0;
+   position: relative;
+}
+body {
+   padding: 2.5em;
+   box-sizing: border-box;
+}
+
+#header, #footer {
+   text-align: center;
+   background-color: #59B;
+   height: 2em;
+   line-height: 2em;
+
+   position: absolute;
+   left: 0;
+   right: 0;
+}
+
+#footer {
+   bottom: 0;
+}
+
+#header {
+   top: 0;
+}
