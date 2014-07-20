@@ -1,0 +1,167 @@
+<html>
+<head>
+   <title>Commiting Code</title>
+   <link rel='stylesheet' type='text/css' href='/common.css'>
+</head>
+<body>
+
+<h1>Commiting Code</h1>
+
+<h2>Tools</h2>
+
+<h4>Git</h4>
+<p>Git is our
+ <a href="http://en.wikipedia.org/wiki/Distributed_revision_control">dvcs</a>
+ (distributed version control system). Without a vcs, there is just one state of
+ code&mdash;the current state. There is no history; there is no undoing
+ to the state of the code a few days ago.</p>
+<p>In git, a series of <em>commits</em> makes up the history of the code.
+ A commit is essentially a <a href="http://en.wikipedia.org/wiki/Diff">diff</a>
+ (line by line difference) between the state of the code at the time of the
+ commit, and the state of the code before the commit. An alternative would be
+ to take a snapshot of the entire codebase at every commit. Not only is that
+ very expensive, it's unecessairy.</p>
+<p>A database of commits represents the history of the project. There is the
+ first commit, the second commit, ..., and the last commit. The last commit
+ is known as the <em>HEAD</em> commit. The HEAD commit is the state of the
+ project at this very moment in time. Whenever you <em>push</em> new commits
+ to the server (upstream) you are updating the HEAD commit on the server (or
+ what is the 'now' state of the project.</p>
+<p>Here is where the <em>d</em> in <em>dvcs</em> comes in. Git is a
+ <em>distributed</em> version control system. All the code for our project
+ is termed the <em>codebase</em>. We have a git <em>repository</em> which
+ versions and manages changes to our codebase. Replicas of this repository exist
+ on your computer, my computer, my other computer, and the server. What makes
+ git a <em>distributed</em> version control system is that you have your own
+ fully functional repository. You can make commits to it, delete commits, and
+ do many other things without ever being connected to the server (which has
+ the <em>upstream</em> repository).
+<p>When you want to share your changes with
+ everyone else, you <em>push</em> your your changes the server. When
+ you want to get your repository synced with what is on the server you
+ <em>pull</em> the changes from the server.</p>
+<h4>SSH (secure shell)</h4>
+<p>On your local computer you can open up a terminal (or shell) which allows
+ you to run programs to interact with the operating system. SSH is a command
+ which opens up a shell on a remote computer. From this secure shell, you can
+ run programs just like you can do on your local machine, but they operate
+ on the remote machine instead.</p>
+<h2>Machines</h2>
+<h4>Server</h4>
+<p>There is a repository on the server (called the upstream repository). You
+ push changes to this repository so that everyone else can pull those changes.
+ If you push changes to one of these hosted html files, such as this one,
+ you will see the changes made on the website too! (requires page refesh) We have
+ a webserver running that looks at the repository and serves the files from it.
+ </p>
+<h4>Local computer (ie personal laptop or desktop)</h4>
+<p>This is the machine you edit code on and run the application on.
+ You can edit code directly on the server, but you can't run our app on it, so
+ I recommend you use a different computer as your local computer.</p>
+
+<h2>Operations</h2>
+
+<h4>Status</h4>
+<tt>git status</tt>
+<p>See the status of your repository. This will list any files you have changed
+ (shown as "modified"), any new files you have made (under the "untracked"
+ section).</p>
+<p>Additionally, if your current branch is tracking the upstream branch,
+ this command will let you know if your code is out of date. eg <tt>"master is
+ behind origin/master by 2 commits"</tt>, where "origin" refers to the upstream
+ server and "master" refers to the branch you are on. I'll go over branches
+ somewhere else. "master" is the only branch you should be on for the time
+ being.</p>
+<h4>Fetch</h4>
+<tt>git fetch</tt>
+<p>Get the latest code from the server, but don't update the local HEAD
+ commit.</p>
+<h4>Pull</h4>
+<tt>git pull</tt>
+<p>Get the latest code fromt he server, and update the local HEAD commit.</p>
+<h4>Push</h4>
+<tt>git push</tt>
+<p>Push your <em>commits</em> to the server. (Note: if your changes haven't been
+ commited, nothing will be pushed)</p>
+<h4>Add</h4>
+<tt>git add &lt;filename&gt;</tt> (stage a single file)<br>
+<tt>git add --all</tt> (stage all files)
+<p><em>Add</em> stages a file to be commited. When you commit, all the staged
+ files are added to the commit, but none of the unstaged files are added to
+ it.</p>
+<h4>Commit</h4>
+<tt>git commit</tt>
+<p>Make a commit out of the <em>staged</em> files. After running this command,
+ your favorite editor should pop up (this can be configured with <tt>git
+ config</tt> where you add a conceptual description of what changes you
+ made.</p>
+<p>The first line of the commit message is a short title for the commit; it
+ should differentiate
+ the commit and make it easy to find, but it doesn't need to be all inclusive
+ of all the details of what was changed. The title should be less than 50
+ characters.</p>
+<p>The second line of the commit message is blank. The third and following lines
+ of the commit message include all the details you want to provide.</p>
+<p>Great commit messages take thought and time, and they are very useful.
+ They're small synopsises of what was changed.</p>
+<h4>Others</h4>
+<p>There are many more, some of which you will need eventually, but this is
+ enough for now.</p>
+
+<h2>Workflow</h2>
+
+<h4>Getting the latest code</h4>
+<tt>git pull</tt>
+<h4>Making a change to the code</h4>
+<tt>git pull</tt> (get up to date)<br>
+(edit code)<br>
+(test code)<br>
+(fix bugs in code)<br>
+(test code again)<br>
+(...repeat until bug-less...)<br>
+<tt>git add</tt> (stage files)<br>
+<tt>git commit</tt> (commit staged files)<br>
+<tt>git push</tt> (push new commit to server)<br>
+
+<p>Sometimes you may pull to get the current code, do some work, commit, and
+ then try to push, but your push will be rejected because someone else pushed
+ a commit between the time you pulled and the time you tried to push. In this
+ case git will not allow you to push&mdash;it will require you to pull
+ before you push.</p>
+<p>You should run the following command if this occurs:</p>
+<tt>git pull --rebase</tt> (pull all the changes from the server, and rebase
+ (move) your new commit(s) on top of them)<br>
+<tt>git push</tt> (try pushing the new commit to the server, again)
+<p>Sometimes you may try to execute this command and it will succeed partially
+ but error out saying there is a <em>merge conflict</em>. This means that
+ the changes that are upstream that you just pulled conflict with the changes
+ you have (eg both people edited the same line, since git does a line-by-line
+ diff when making commits).</p>
+<p>In this case you need to run <tt>git status</tt> to see which files have the
+ merge conflicts. The files that have conflicts should be near the end of
+ the listing and they will be marked as "both modified". Edit each of these
+ files with your favorite text editor and search for lines that start with
+ <tt>&gt;&gt;&gt;</tt>. I do this in vim by running the following command:
+ <tt>/&gt;&gt;&gt;</tt>. The '/' is the search command and then you enter the
+ text you want to search for.</p>
+<p>These lines composed of &gt;'s and &lt;'s will surround the code that is
+ conflicted. One section will be be labeled ORIGIN or UPSTREAM (not sure
+ which), and the other will be labeled LOCAL or HEAD (not sure..) One section is
+ distinctively "the code that was on the server" and the other is "the code
+ you wrote". You need to use thinking to determine which lines should stay,
+ which lines should go, and what problems may occur by removing, adding, or
+ deleting certain lines out of the conflicting lines.</p>
+<p>The &gt; and &lt; lines should be deleted from the file.. git just added them
+ so you can tell which of the conflicting lines are from upstream and which
+ lines are local.</p>
+<p>After you have resolved all the conflicts, make sure to retest the
+ application&mdash;especially the parts involving the conflicting areas of code.
+ Merges are a prominent source of bugs.</p>
+<p>Finally, run <tt>git commit</tt> to finish the merging process. Git will
+ inform you that you are ahead of origin by one commit, and you should
+ <tt>git push</tt>.
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script type='text/javascript' src='/common.js'></script>
+</body>
+</html>
