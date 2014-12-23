@@ -1,17 +1,25 @@
 package org.eliteware.rally;
 
+import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.location.*;
+import android.widget.TextView;
 
 
-public class Main extends ActionBarActivity {
+public class Main extends ActionBarActivity implements LocationListener {
+    protected LocationManager locationManager = null;
+    protected TextView textView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        this.textView = (TextView)this.findViewById(R.id.theTextView);
     }
 
 
@@ -32,5 +40,15 @@ public class Main extends ActionBarActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onProviderEnabled(String provider) {
+    }
+    public void onProviderDisabled(String provider) {
+    }
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+    }
+    public void onLocationChanged(Location location) {
+        this.textView.setText(location.toString());
     }
 }
