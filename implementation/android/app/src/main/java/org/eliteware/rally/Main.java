@@ -14,7 +14,6 @@ import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.*;
 import java.io.*;
 
-
 public class Main extends ActionBarActivity implements LocationListener, SensorEventListener {
     protected TextView textView = null;
 
@@ -63,9 +62,16 @@ public class Main extends ActionBarActivity implements LocationListener, SensorE
             InputStream is = entity.getContent();
             response = IOUtils.toString(is, entity.getContentEncoding());
 
+            response = "";
+            java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+            while (s.hasNext())
+                response += s.next();
+
         } catch (IOException e) {
             System.out.println(e.toString());
         }
+
+        System.out.println("RESPONSE: " + response);
     }
 
     @Override
