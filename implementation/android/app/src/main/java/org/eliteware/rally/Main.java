@@ -8,6 +8,9 @@ import android.view.MenuItem;
 import android.location.*;
 import android.widget.TextView;
 import android.hardware.*;
+import org.apache.http.client.*;
+import org.apache.http.client.methods.*;
+import org.apache.http.impl.client.*;
 
 
 public class Main extends ActionBarActivity implements LocationListener, SensorEventListener {
@@ -21,6 +24,8 @@ public class Main extends ActionBarActivity implements LocationListener, SensorE
     protected Location lastLocation = null;
     protected SensorEvent lastMagnetometerEvent = null;
     protected SensorEvent lastAccelerometerEvent = null;
+
+    protected HttpClient httpClient = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +42,9 @@ public class Main extends ActionBarActivity implements LocationListener, SensorE
         this.sensorManager.registerListener(this, this.magnetometer, SensorManager.SENSOR_DELAY_GAME);
 
         this.textView = (TextView)this.findViewById(R.id.theTextView);
+
+        this.httpClient = new DefaultHttpClient();
+        HttpPost httpPost = new HttpPost("thor.joshterrell.com:6721");
     }
 
     @Override
