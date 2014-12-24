@@ -8,9 +8,11 @@ import android.view.MenuItem;
 import android.location.*;
 import android.widget.TextView;
 import android.hardware.*;
+import org.apache.http.*;
 import org.apache.http.client.*;
 import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.*;
+import java.io.*;
 
 
 public class Main extends ActionBarActivity implements LocationListener, SensorEventListener {
@@ -26,6 +28,9 @@ public class Main extends ActionBarActivity implements LocationListener, SensorE
     protected SensorEvent lastAccelerometerEvent = null;
 
     protected HttpClient httpClient = null;
+
+    protected Double otherLatitude = null;
+    protected Double otherLongitude = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +50,22 @@ public class Main extends ActionBarActivity implements LocationListener, SensorE
 
         this.httpClient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost("thor.joshterrell.com:6721");
+        httpPost.setHeader("taco", "true");
+        HttpResponse httpResponse = null;
+        String response = null;
+        try {
+            httpResponse = this.httpClient.execute(httpPost);
+        } catch (IOException e) {
+            System.out.println(e.toString());
+        }
+        try {
+            HttpEntity entity = httpResponse.getEntity();
+            InputStream is = entity.getContent();
+            response = IOUtils.toString(is, entity.getContentEncoding());
+
+        } catch (IOException e) {
+            System.out.println(e.toString());
+        }
     }
 
     @Override
