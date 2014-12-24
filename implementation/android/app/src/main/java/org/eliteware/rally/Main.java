@@ -26,10 +26,9 @@ public class Main extends ActionBarActivity implements LocationListener, SensorE
     protected SensorEvent lastMagnetometerEvent = null;
     protected SensorEvent lastAccelerometerEvent = null;
 
-    protected HttpClient httpClient = null;
-
     protected Double otherLatitude = null;
     protected Double otherLongitude = null;
+    protected String userId = "1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,31 +46,43 @@ public class Main extends ActionBarActivity implements LocationListener, SensorE
 
         this.textView = (TextView)this.findViewById(R.id.theTextView);
 
-        this.httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost("thor.joshterrell.com:6721");
-        httpPost.setHeader("taco", "true");
-        HttpResponse httpResponse = null;
-        String response = null;
-        try {
-            httpResponse = this.httpClient.execute(httpPost);
-        } catch (IOException e) {
-            System.out.println(e.toString());
+        // Get other client's position
+        new Thread(new GetLocation()).start();
+    }
+
+    class GetLocation implements Runnable {
+        @Override
+        public void run() {
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpResponse httpResponse = null;
+            String response = null;
+            try {
+                HttpGet httpGet = new HttpGet("http://thor.joshterrell.com:6721");
+                httpGet.setHeader("userid", userId);
+
+                httpResponse = httpClient.execute(httpGet);
+                HttpEntity entity = httpResponse.getEntity();
+                InputStream is = entity.getContent();
+
+                response = "";
+                java.util.Scanner s = new java.util.Scanner(is);
+                while (s.hasNext())
+                    response += s.next();
+            } catch (IOException e) {
+                System.out.println(e.toString());
+            }
+
+            if (response != null && !response.equals("")) {
+                System.out.println("RESPONSE: " + response);
+                String[] coords = response.split(",");
+                otherLongitude = Double.parseDouble(coords[0]);
+                otherLatitude = Double.parseDouble(coords[1]);
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {}
+            new Thread(new GetLocation()).start();
         }
-        try {
-            HttpEntity entity = httpResponse.getEntity();
-            InputStream is = entity.getContent();
-            response = IOUtils.toString(is, entity.getContentEncoding());
-
-            response = "";
-            java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-            while (s.hasNext())
-                response += s.next();
-
-        } catch (IOException e) {
-            System.out.println(e.toString());
-        }
-
-        System.out.println("RESPONSE: " + response);
     }
 
     @Override
@@ -124,9 +135,28 @@ public class Main extends ActionBarActivity implements LocationListener, SensorE
     public void onStatusChanged(String provider, int status, Bundle extras) {
         System.out.println(status + ": " + provider);
     }
-    public void onLocationChanged(Location location) {
+    public void onLocationChanged(final Location location) {
         this.lastLocation = location;
         this.updateDisplay();
+
+        // Update position on server
+        new Thread(new Runnable() {
+            public void run() {
+                HttpClient httpClient = new DefaultHttpClient();
+                HttpResponse httpResponse = null;
+                String response = null;
+                try {
+                    HttpPost httpPost = new HttpPost("http://thor.joshterrell.com:6721");
+                    httpPost.setHeader("coords", Double.toString(location.getLongitude()) + "," +
+                            Double.toString(location.getLatitude()));
+                    httpPost.setHeader("userid", userId);
+
+                    httpResponse = httpClient.execute(httpPost);
+                } catch (IOException e) {
+                    System.out.println(e.toString());
+                }
+            }
+        }).start();
     }
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
